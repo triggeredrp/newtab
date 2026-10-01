@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New Tab</title>
+<style>
+  :root {
+    --hat: #f5c842;      /* straw hat yellow: the only accent */
+    --ink: #0e1a2b;
+    --text: #fff8e7;
+    --font: "Segoe UI", system-ui, sans-serif; /* system font: nothing to download */
+  }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--ink) url("luffy.jpg") center / cover no-repeat; /* put your resized image next to this file */
+    color: var(--text);
+    font-family: var(--font);
+    display: grid;
+    place-items: end start;
+    overflow: hidden;
+  }
+  /* Dim layer keeps the text readable (no blur = no GPU cost) */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background: linear-gradient(to top right, rgba(14,26,43,.75), rgba(14,26,43,0) 60%);
+  }
+  main {
+    position: relative;
+    padding: 0 0 7vh 6vw;
+    animation: rise 1.2s ease-out both; /* one entrance, runs once */
+  }
+  #clock {
+    font-size: clamp(4rem, 14vw, 9rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1;
+    text-shadow: 0 2px 24px rgba(0,0,0,.45);
+  }
+  #date {
+    margin-top: .6rem;
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    letter-spacing: .04em;
+    color: var(--hat);
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  @media (prefers-reduced-motion: reduce) {
+    main { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div id="clock">00:00</div>
+  <div id="date"></div>
+</main>
+<script>
+  const clock = document.getElementById("clock");
+  const date = document.getElementById("date");
+  const dateFmt = new Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "long" });
+
+  function tick() {
+    const now = new Date();
+    clock.textContent = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+    date.textContent = dateFmt.format(now);
+    // Wake up once per minute, right when the minute changes (no per-second timer)
+    setTimeout(tick, 60000 - (now.getSeconds() * 1000 + now.getMilliseconds()));
+  }
+  tick();
+</script>
+</body>
+</html>
